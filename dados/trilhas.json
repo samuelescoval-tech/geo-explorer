@@ -1,0 +1,32 @@
+{
+  "trilhas": [
+    {
+      "tecnologia": "JavaScript",
+      "niveis": ["iniciante", "intermediario", "avancado"],
+      "modulos": {
+        "iniciante": ["Variáveis e tipos", "Funções", "Arrays e objetos"],
+        "intermediario": ["Promises e async/await", "DOM", "Módulos ES6"],
+        "avancado": ["Performance", "Design patterns", "Testes unitários"]
+      },
+      "desafios": {
+        "iniciante": "Crie uma função que inverte uma string.",
+        "intermediario": "Implemente uma função que busca dados de uma API.",
+        "avancado": "Implemente o padrão Observer do zero."
+      }
+    },
+    {
+      "tecnologia": "Python",
+      "niveis": ["iniciante", "intermediario", "avancado"],
+      "modulos": {
+        "iniciante": ["Sintaxe básica", "Listas e dicionários", "Funções"],
+        "intermediario": ["POO", "Manipulação de arquivos", "Bibliotecas padrão"],
+        "avancado": ["Decorators", "Generators", "Testes com pytest"]
+      },
+      "desafios": {
+        "iniciante": "Escreva um script que conta palavras em um texto.",
+        "intermediario": "Crie uma classe que representa uma pilha (stack).",
+        "avancado": "Implemente um decorator de cache (memoize)."
+      }
+    }
+  ]
+}
