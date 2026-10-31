@@ -19,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/samuelescoval-tech/geo-explorer/issues"
   },
-  "homepage": "https://github.com/samuelescoval-tech/geo-explorer#readme"
+  "homepage": "https://github.com/samuelescoval-tech/geo-explorer#readme",
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
+    "zod": "^4.6.7"
+  }
 }

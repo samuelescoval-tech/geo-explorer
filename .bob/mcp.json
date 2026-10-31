@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "geo-explorer": {
+      "command": "node",
+      "args": ["/home/samu-alba/geo-explorer/mcp/index.js"]
+    }
+  }
+}
