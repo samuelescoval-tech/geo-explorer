@@ -2,7 +2,10 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
-const PROGRESSO_PATH = path.join(__dirname, '..', 'dados', 'progresso.json');
+// ── arquivo temporário isolado — nunca toca dados/progresso.json ──────────────
+const PROGRESSO_TMP = path.join(__dirname, '..', 'dados', 'progresso.certificado.test.json');
+process.env.PROGRESSO_PATH = PROGRESSO_TMP;
+
 const { verificarCertificado, listarCertificados, niveisPendentes } = require('../comandos/certificado');
 
 // ── utilidades de teste ───────────────────────────────────────────────────────
@@ -32,7 +35,7 @@ function mockExit(fn) {
 
 function setProgresso(concluidos) {
   fs.writeFileSync(
-    PROGRESSO_PATH,
+    PROGRESSO_TMP,
     JSON.stringify({ concluidos }, null, 2) + '\n',
     'utf-8'
   );
@@ -114,7 +117,7 @@ const TODOS_PY = ['python:iniciante', 'python:intermediario', 'python:avancado']
   console.log('✔ verificarCertificado — tecnologia inexistente chama process.exit');
 }
 
-// ── Limpeza — restaura estado anterior ao teste ───────────────────────────────
-setProgresso(['javascript:intermediario']);
+// ── Limpeza — remove arquivo temporário ──────────────────────────────────────
+fs.unlinkSync(PROGRESSO_TMP);
 
 console.log('\nTodos os testes passaram.\n');

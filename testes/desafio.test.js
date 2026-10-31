@@ -2,7 +2,10 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
-const PROGRESSO_PATH = path.join(__dirname, '..', 'dados', 'progresso.json');
+// ── arquivo temporário isolado — nunca toca dados/progresso.json ──────────────
+const PROGRESSO_TMP = path.join(__dirname, '..', 'dados', 'progresso.desafio.test.json');
+process.env.PROGRESSO_PATH = PROGRESSO_TMP;
+
 const { mostrarDesafio, concluirDesafio, statusDesafios } = require('../comandos/desafio');
 
 // ── utilidades de teste ───────────────────────────────────────────────────────
@@ -35,14 +38,17 @@ function mockExit(fn) {
   return exitChamado;
 }
 
-// Reinicia progresso.json antes de cada grupo de testes que escreve no disco
-function resetarProgresso() {
-  fs.writeFileSync(PROGRESSO_PATH, JSON.stringify({ concluidos: [] }, null, 2) + '\n', 'utf-8');
+function setProgresso(concluidos) {
+  fs.writeFileSync(
+    PROGRESSO_TMP,
+    JSON.stringify({ concluidos }, null, 2) + '\n',
+    'utf-8'
+  );
 }
 
 // ── Teste 1: mostrarDesafio exibe enunciado e status pendente ─────────────────
 {
-  resetarProgresso();
+  setProgresso([]);
   const { saidas } = capturarSaida(() => mostrarDesafio('JavaScript', 'iniciante'));
   const texto = saidas.join('\n');
   assert.ok(texto.includes('JavaScript'), 'Deve mostrar a tecnologia');
@@ -54,22 +60,22 @@ function resetarProgresso() {
 
 // ── Teste 2: concluirDesafio persiste no disco e confirma ─────────────────────
 {
-  resetarProgresso();
+  setProgresso([]);
   const { saidas } = capturarSaida(() => concluirDesafio('JavaScript', 'iniciante'));
   const texto = saidas.join('\n');
   assert.ok(texto.includes('concluído'), 'Deve confirmar conclusão');
 
-  const progresso = JSON.parse(fs.readFileSync(PROGRESSO_PATH, 'utf-8'));
+  const progresso = JSON.parse(fs.readFileSync(PROGRESSO_TMP, 'utf-8'));
   assert.ok(
     progresso.concluidos.includes('javascript:iniciante'),
-    'Deve persistir a chave no progresso.json'
+    'Deve persistir a chave no arquivo temporário'
   );
   console.log('✔ concluirDesafio — persiste no disco e confirma');
 }
 
 // ── Teste 3: mostrarDesafio exibe status concluído após marcar ────────────────
 {
-  resetarProgresso();
+  setProgresso([]);
   capturarSaida(() => concluirDesafio('Python', 'avancado'));
   const { saidas } = capturarSaida(() => mostrarDesafio('Python', 'avancado'));
   const texto = saidas.join('\n');
@@ -79,10 +85,10 @@ function resetarProgresso() {
 
 // ── Teste 4: concluirDesafio duas vezes não duplica a entrada ─────────────────
 {
-  resetarProgresso();
+  setProgresso([]);
   capturarSaida(() => concluirDesafio('Python', 'intermediario'));
   capturarSaida(() => concluirDesafio('Python', 'intermediario'));
-  const progresso = JSON.parse(fs.readFileSync(PROGRESSO_PATH, 'utf-8'));
+  const progresso = JSON.parse(fs.readFileSync(PROGRESSO_TMP, 'utf-8'));
   const ocorrencias = progresso.concluidos.filter(k => k === 'python:intermediario').length;
   assert.strictEqual(ocorrencias, 1, 'Não deve duplicar entradas no progresso');
   console.log('✔ concluirDesafio — não duplica entradas');
@@ -90,7 +96,7 @@ function resetarProgresso() {
 
 // ── Teste 5: statusDesafios exibe todas as tecnologias e níveis ───────────────
 {
-  resetarProgresso();
+  setProgresso([]);
   const { saidas } = capturarSaida(() => statusDesafios());
   const texto = saidas.join('\n');
   assert.ok(texto.includes('JavaScript'), 'Deve listar JavaScript');
@@ -102,7 +108,7 @@ function resetarProgresso() {
 
 // ── Teste 6: tecnologia inexistente chama process.exit ────────────────────────
 {
-  resetarProgresso();
+  setProgresso([]);
   const saiu = mockExit(() => capturarSaida(() => mostrarDesafio('Ruby', 'iniciante')));
   assert.ok(saiu, 'Deve chamar process.exit para tecnologia inexistente');
   console.log('✔ mostrarDesafio — tecnologia inexistente chama process.exit');
@@ -110,13 +116,13 @@ function resetarProgresso() {
 
 // ── Teste 7: nível inexistente chama process.exit ─────────────────────────────
 {
-  resetarProgresso();
+  setProgresso([]);
   const saiu = mockExit(() => capturarSaida(() => mostrarDesafio('JavaScript', 'expert')));
   assert.ok(saiu, 'Deve chamar process.exit para nível inexistente');
   console.log('✔ mostrarDesafio — nível inexistente chama process.exit');
 }
 
-// ── Limpeza ───────────────────────────────────────────────────────────────────
-resetarProgresso();
+// ── Limpeza — remove arquivo temporário ──────────────────────────────────────
+fs.unlinkSync(PROGRESSO_TMP);
 
 console.log('\nTodos os testes passaram.\n');

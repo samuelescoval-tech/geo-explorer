@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const TRILHAS_PATH = path.join(__dirname, '..', 'dados', 'trilhas.json');
-const PROGRESSO_PATH = path.join(__dirname, '..', 'dados', 'progresso.json');
+const PROGRESSO_PATH =
+  process.env.PROGRESSO_PATH || path.join(__dirname, '..', 'dados', 'progresso.json');
 
 // ── helpers de dados ──────────────────────────────────────────────────────────
 
