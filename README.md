@@ -153,6 +153,7 @@ ordem, como um usuário real faria.
 
 ## Estrutura do projeto
 
+```
 geo-explorer/
 ├── index.js                  # Entry point, lê argv e despacha para o comando
 ├── package.json
@@ -171,6 +172,7 @@ geo-explorer/
 │   ├── desafio.test.js
 │   └── certificado.test.js
 └── docs/
+```
 
 ## Trilhas disponíveis
 
