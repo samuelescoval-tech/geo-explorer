@@ -75,7 +75,8 @@ function setProgresso(concluidos) {
 
 // ── Teste 3: mostrarDesafio exibe status concluído após marcar ────────────────
 {
-  setProgresso([]);
+  // avancado exige iniciante e intermediario concluídos primeiro
+  setProgresso(['python:iniciante', 'python:intermediario']);
   capturarSaida(() => concluirDesafio('Python', 'avancado'));
   const { saidas } = capturarSaida(() => mostrarDesafio('Python', 'avancado'));
   const texto = saidas.join('\n');
@@ -85,7 +86,8 @@ function setProgresso(concluidos) {
 
 // ── Teste 4: concluirDesafio duas vezes não duplica a entrada ─────────────────
 {
-  setProgresso([]);
+  // intermediario exige iniciante concluído
+  setProgresso(['python:iniciante']);
   capturarSaida(() => concluirDesafio('Python', 'intermediario'));
   capturarSaida(() => concluirDesafio('Python', 'intermediario'));
   const progresso = JSON.parse(fs.readFileSync(PROGRESSO_TMP, 'utf-8'));
@@ -104,6 +106,31 @@ function setProgresso(concluidos) {
   assert.ok(texto.includes('iniciante'), 'Deve listar o nível iniciante');
   assert.ok(texto.includes('avancado'), 'Deve listar o nível avancado');
   console.log('✔ statusDesafios — exibe todas as tecnologias e níveis');
+}
+
+// ── Teste 8: concluirDesafio bloqueado sem pré-requisito ─────────────────────
+{
+  setProgresso([]);
+  const saiu = mockExit(() => capturarSaida(() => concluirDesafio('JavaScript', 'intermediario')));
+  assert.ok(saiu, 'Deve chamar process.exit ao tentar concluir intermediario sem iniciante');
+  const progresso = JSON.parse(fs.readFileSync(PROGRESSO_TMP, 'utf-8'));
+  assert.ok(
+    !progresso.concluidos.includes('javascript:intermediario'),
+    'Não deve persistir o nível bloqueado'
+  );
+  console.log('✔ concluirDesafio — bloqueado sem pré-requisito');
+}
+
+// ── Teste 9: concluirDesafio liberado com pré-requisito concluído ─────────────
+{
+  setProgresso(['javascript:iniciante', 'javascript:intermediario']);
+  capturarSaida(() => concluirDesafio('JavaScript', 'avancado'));
+  const progresso = JSON.parse(fs.readFileSync(PROGRESSO_TMP, 'utf-8'));
+  assert.ok(
+    progresso.concluidos.includes('javascript:avancado'),
+    'Deve persistir avancado quando pré-requisitos estão concluídos'
+  );
+  console.log('✔ concluirDesafio — liberado com pré-requisito concluído');
 }
 
 // ── Teste 6: tecnologia inexistente chama process.exit ────────────────────────

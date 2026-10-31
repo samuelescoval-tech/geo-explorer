@@ -69,6 +69,17 @@ function concluirDesafio(tecnologia, nivel) {
     return;
   }
 
+  // Verifica pré-requisito: o nível anterior deve estar concluído
+  const idxNivel = trilha.niveis.indexOf(nivelNorm);
+  if (idxNivel > 0) {
+    const nivelAnterior = trilha.niveis[idxNivel - 1];
+    if (!progresso.concluidos.includes(chave(tecnologia, nivelAnterior))) {
+      console.error(`\nNão é possível concluir ${trilha.tecnologia} — ${nivelNorm}.`);
+      console.error(`Conclua primeiro o nível "${nivelAnterior}".\n`);
+      process.exit(1);
+    }
+  }
+
   progresso.concluidos.push(k);
   salvarProgresso(progresso);
   console.log(`\n✔ Desafio ${trilha.tecnologia} — ${nivelNorm} marcado como concluído!\n`);
